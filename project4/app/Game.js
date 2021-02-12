@@ -27,12 +27,40 @@ class Game {
     this.table.showPlayerPoints(this.player.calculatePoints());
   }
 
+  endGame() {
+    this.hitBtn.removeEventListener("click", (e) => this.hitCard());
+    this.standBtn.removeEventListener("click", (e) => this.dealerPlays());
+
+    if(this.player.points < 21 && this.player.points == this.dealer.points) {
+      console.log("remis")
+      return;
+    }
+
+    if(this.player.points > 21) {
+      console.log("dealer wygrywa")
+      return;
+    }
+
+    if(this.dealer.points > 21) {
+      console.log("gracz wygrywa")
+      return;
+    }
+
+    if(this.player.points < this.dealer.points) {
+      console.log("dealer wygrywa")
+      return;
+    }
+
+  }
+
   dealerPlays(e) {
     while( this.dealer.points < this.player.points && this.dealer.points < 21 && this.player.points <= 21) {
       const card = this.deck.pickOne();
       this.dealer.hand.addCard(card);
       this.table.showDealerPoints(this.dealer.calculatePoints());
     }
+
+    this.endGame();
   }
 
   dealCards() {
