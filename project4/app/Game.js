@@ -1,22 +1,26 @@
 import { Deck } from "./Deck.js";
+import { Message } from "./Message.js";
 import { Player } from "./Player.js";
 import { Table } from "./Table.js";
 
 class Game {
 
-  constructor({hitBtn, standBtn, table, player}) {
+  constructor({hitBtn, standBtn, table, player, messageBox}) {
     this.hitBtn = hitBtn,
     this.standBtn = standBtn,
     this.player = player;
+    this.messageBox = messageBox;
     this.dealer = new Player("Krupier");
     this.table = table
     this.deck = new Deck();
     this.deck.shuffle();
+    this.hitCard = this.hitCard.bind(this);
+    this.dealerPlays = this.dealerPlays.bind(this);
   }
 
   run() {
-    this.hitBtn.addEventListener("click", (e) => this.hitCard());
-    this.standBtn.addEventListener("click", (e) => this.dealerPlays());
+    this.hitBtn.addEventListener("click", this.hitCard);
+    this.standBtn.addEventListener("click", this.dealerPlays);
     this.dealCards();
   }
 
@@ -28,26 +32,29 @@ class Game {
   }
 
   endGame() {
-    this.hitBtn.removeEventListener("click", (e) => this.hitCard());
-    this.standBtn.removeEventListener("click", (e) => this.dealerPlays());
+    this.hitBtn.removeEventListener("click", this.hitCard);
+    this.standBtn.removeEventListener("click", this.dealerPlays);
 
-    if(this.player.points < 21 && this.player.points == this.dealer.points) {
-      console.log("remis")
+    this.hitBtn.style.display = "none";
+    this.standBtn.style.display = "none";
+
+    if(this.player.points <= 21 && this.player.points == this.dealer.points) {
+      this.messageBox.setText("Remis").show();
       return;
     }
 
     if(this.player.points > 21) {
-      console.log("dealer wygrywa")
+      this.messageBox.setText("Dealer wygrywa").show();
       return;
     }
 
     if(this.dealer.points > 21) {
-      console.log("gracz wygrywa")
+      this.messageBox.setText("Gracz wygrywa").show();
       return;
     }
 
     if(this.player.points < this.dealer.points) {
-      console.log("dealer wygrywa")
+      this.messageBox.setText("Dealer wygrywa").show();
       return;
     }
 
@@ -80,11 +87,13 @@ class Game {
 }
 
 const table = new Table(document.getElementById('dealersCards'), document.getElementById('playersCards'), document.getElementById('dealerPoints'), document.getElementById('playerPoints'));
+const messageBox = new Message(document.getElementById("message"));
 const player = new Player("Jan");
 const game = new Game({
   hitBtn: document.getElementById("hit"),
   standBtn: document.getElementById("stand"),
   player,
-  table
+  table,
+  messageBox
 });
 game.run();
